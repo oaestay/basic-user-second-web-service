@@ -33,7 +33,9 @@ class UsersController < ApplicationController
   # POST /rest/verify/:email
   def verify
     @user = User.find_by!(email: params[:email])
-    message, status = verify_user(@user, params[:image]) ? ["OK", 200] : ["No Autorizado", 401]
+    is_verified = verify_user(@user, params[:image])
+    if is_verified then UserNotifierMailer.send_signin_email(@user, request.user_agent).deliver_later end
+    message, status = is_verified ? ["OK", 200] : ["No Autorizado", 401]
     json_response({ message: message }, status)
   end
 
