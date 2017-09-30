@@ -32,9 +32,9 @@ class UsersController < ApplicationController
 
   # POST /rest/verify/:email
   def verify
-    @user = User.find_by!(email: params[:email])
-    is_verified = verify_user(@user, params[:image])
-    if is_verified then UserNotifierMailer.send_signin_email(@user, request.user_agent).deliver_later end
+    user = User.find_by!(email: params[:email])
+    is_verified = verify_user(user, params[:image])
+    if is_verified then UserNotifierMailer.send_signin_email(user, params[:useragent]).deliver_later end
     message, status = is_verified ? ["OK", 200] : ["No Autorizado", 401]
     json_response({ message: message }, status)
   end
@@ -43,7 +43,7 @@ class UsersController < ApplicationController
 
   def user_params
     # whitelist params
-    params.permit(:email, :image)
+    params.permit(:email, :image, :useragent)
   end
 
   def set_user
